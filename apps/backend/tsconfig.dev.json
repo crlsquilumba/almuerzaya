@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "ts-node": {
+    "esm": true,
+    "skipLibCheck": true,
+    "transpileOnly": true,
+    "compilerOptions": {
+      "noImplicitAny": false,
+      "noUnusedLocals": false,
+      "noUnusedParameters": false
+    }
+  }
+}
