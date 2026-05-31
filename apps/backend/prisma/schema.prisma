@@ -1,0 +1,343 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========== User Management ==========
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(CUSTOMER)
+
+  // Relations - Old (kept for backwards compatibility, will deprecate)
+  // Named relation for legacy ownerId relationship
+  ownedRestaurants Restaurant[] @relation("LegacyOwner")
+
+  // Relations - New (many-to-many with restaurants)
+  restaurantRoles UserRestaurant[] @relation("UserRestaurants")
+
+  // Relations - Other
+  reservations Reservation[]
+  payments Payment[]
+  refreshTokens RefreshToken[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@map("users")
+}
+
+enum UserRole {
+  CUSTOMER
+  RESTAURANT_OWNER
+  ADMIN
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ========== User-Restaurant Association ==========
+
+model UserRestaurant {
+  id            String   @id @default(uuid())
+
+  // User reference
+  userId        String
+  user          User     @relation("UserRestaurants", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Restaurant reference
+  restaurantId  String
+  restaurant    Restaurant @relation("UserRestaurants", fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  // Role in this restaurant
+  role          RestaurantRole @default(OWNER)
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Ensure unique user-restaurant pairs (one user can have only one role per restaurant)
+  @@unique([userId, restaurantId])
+  @@index([userId])
+  @@index([restaurantId])
+  @@map("user_restaurants")
+}
+
+enum RestaurantRole {
+  OWNER      // Propietario principal (crea el restaurante)
+  MANAGER    // Gerente (puede editar menú, ver reservas)
+  CHEF       // Chef/Cocinero (ve órdenes, actualiza estado)
+  STAFF      // Personal (acceso limitado)
+}
+
+// ========== Restaurant Management ==========
+
+model Restaurant {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  address   String
+  phone     String
+  email     String?
+  latitude  Float
+  longitude Float
+
+  // Owner info - DEPRECATED (use userRoles instead)
+  // Kept for backwards compatibility, will be phased out
+  ownerId   String?
+  owner     User?    @relation("LegacyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  // Business info
+  description String?
+  imageUrl    String?
+  bankAccount String?  // DeUna/Bank account for payments
+  basePrice   Float    @default(5.0)  // Base menu price
+  isOpen      Boolean  @default(true)
+  openingTime String?  // HH:MM format
+  closingTime String?  // HH:MM format
+
+  // Relations - Users (many-to-many via UserRestaurant)
+  userRoles   UserRestaurant[] @relation("UserRestaurants")
+
+  // Relations - Other
+  menuItems MenuItem[]
+  dailyMenus DailyMenu[]
+  reservations Reservation[]
+  payments Payment[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([ownerId])
+  @@index([latitude, longitude])
+  @@map("restaurants")
+}
+
+// ========== Menu Management ==========
+
+model MenuItem {
+  id        String   @id @default(uuid())
+  name      String
+  description String?
+  price     Float
+  category  String
+  imageUrl  String?
+  available Boolean  @default(true)
+
+  // Relations
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  reservationItems ReservationItem[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@unique([restaurantId, name])
+  @@index([restaurantId])
+  @@map("menu_items")
+}
+
+// ========== Daily Menu Management ==========
+
+model DailyMenu {
+  id        String   @id @default(uuid())
+  nombre    String
+  imagen    String?
+  price     Decimal  @default(5.0)  @db.Decimal(10,2)  // ✅ Decimal para dinero (10 dígitos, 2 decimales)
+
+  // Sopa
+  sopaName  String
+  sopaExtras String?
+
+  // Segundo
+  proteinaName String
+  guarniciones String?
+  ensalada String?
+
+  // Complementos
+  bebida String?
+  postre String?
+
+  // Status
+  isActive  Boolean  @default(false)
+  date      DateTime @default(now())
+
+  // Relations
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@index([restaurantId])
+  @@index([date])
+  @@map("daily_menus")
+}
+
+// ========== Reservation Management ==========
+
+model Reservation {
+  id        String   @id @default(uuid())
+  reservationCode String @unique @default(uuid())
+
+  // Customer info
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Restaurant info
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  // Reservation details
+  reservationDate DateTime
+  reservationTime String  // HH:MM format
+  partySize       Int
+  specialRequests String?
+  status          ReservationStatus @default(PENDING)
+
+  // Items ordered
+  items ReservationItem[]
+
+  // Payment
+  payment Payment?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  confirmedAt DateTime?
+  completedAt DateTime?
+  canceledAt DateTime?
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([status])
+  @@map("reservations")
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  READY_FOR_PICKUP
+  COMPLETED
+  CANCELLED
+}
+
+model ReservationItem {
+  id        String   @id @default(uuid())
+
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  // NOTE: onDelete: Restrict prevents deleting a menu item if it's been ordered
+
+  quantity  Int
+  unitPrice Float
+  subtotal  Float // quantity * unitPrice
+
+  @@index([reservationId])
+  @@index([menuItemId])
+  @@map("reservation_items")
+}
+
+// ========== Payment Management ==========
+
+model Payment {
+  id        String   @id @default(uuid())
+  paymentCode String @unique @default(uuid())
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  reservationId String @unique
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  // Payment details
+  amount      Float
+  currency    String  @default("USD")
+  status      PaymentStatus @default(PENDING)
+  method      PaymentMethod
+
+  // QR Code
+  qrCode      String?
+  qrExpiry    DateTime?
+
+  // Proof
+  proofUrl    String?
+  proofVerifiedAt DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  verifiedAt DateTime?
+  completedAt DateTime?
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([reservationId])
+  @@index([status])
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  AWAITING_PROOF
+  VERIFIED
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PICHINCHA_QR
+  TRANSFER
+  CASH
+  CARD
+}
+
+// ========== Health & Audit ==========
+
+model HealthCheck {
+  id        String   @id @default(uuid())
+  status    String   @default("healthy")
+  database  String   @default("connected")
+  timestamp DateTime @default(now())
+
+  @@map("health_checks")
+}

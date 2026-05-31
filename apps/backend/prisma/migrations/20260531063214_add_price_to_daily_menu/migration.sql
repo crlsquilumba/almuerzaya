@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "daily_menus" ADD COLUMN "price" DOUBLE PRECISION NOT NULL DEFAULT 5.0;

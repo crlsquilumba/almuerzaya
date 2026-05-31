@@ -1,0 +1,464 @@
+# ============================================================================
+# ALMUERZA YA - Professional .gitignore
+# ============================================================================
+# Last Updated: 2026-05-31
+# Purpose: Exclude files that shouldn't be version controlled
+# ============================================================================
+
+# ============================================================================
+# ENVIRONMENT & SECRETS
+# ============================================================================
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.test
+
+# AWS credentials
+.aws/
+.aws/credentials
+.aws/config
+
+# SSH Keys
+*.pem
+*.key
+*.pub
+
+# API Keys and tokens
+**/secrets/
+**/.secrets/
+*.secret
+
+# ============================================================================
+# NODE.JS / NPM / YARN / PNPM
+# ============================================================================
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+lerna-debug.log
+
+# npm cache
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# npm workspace
+.npmrc
+
+# Dependency management
+dist/
+build/
+.next/
+out/
+
+# ============================================================================
+# FRONTEND / REACT / VITE
+# ============================================================================
+
+# Vite build output
+apps/web/dist/
+apps/web/build/
+apps/web/.vite/
+
+# React build
+apps/web/coverage/
+
+# Tailwind CSS cache
+.tailwindcss/
+
+# Next.js
+apps/web/.next/
+apps/web/out/
+
+# ============================================================================
+# BACKEND / NODE.JS SERVER
+# ============================================================================
+
+# Build outputs
+apps/backend/dist/
+apps/backend/build/
+apps/backend/.turbo/
+
+# Runtime data
+apps/backend/.runtime/
+apps/backend/pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Logs
+logs/
+*.log
+lerna-debug.log
+
+# ============================================================================
+# DATABASE & DATA
+# ============================================================================
+
+# SQLite (dev databases)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Prisma generated files
+prisma/.migration_lock.toml
+
+# MongoDB
+.mongod
+.mongodb
+
+# PostgreSQL
+postgres_data/
+pgadmin_data/
+
+# ============================================================================
+# FLUTTER / MOBILE
+# ============================================================================
+
+# Flutter/Dart
+apps/mobile/build/
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/.packages
+apps/mobile/pubspec.lock
+
+# iOS
+apps/mobile/ios/.symlinks/
+apps/mobile/ios/**/*.mode1v3
+apps/mobile/ios/**/*.mode2v3
+apps/mobile/ios/**/*.moved-aside
+apps/mobile/ios/**/*.pbxuser
+apps/mobile/ios/**/*.perspectivev3
+apps/mobile/ios/**/*sync/
+apps/mobile/ios/**/.sconsign.dblite
+apps/mobile/ios/**/.tags*
+apps/mobile/ios/**/.vagrant/
+apps/mobile/ios/**/DerivedData/
+apps/mobile/ios/**/Icon?
+apps/mobile/ios/**/Pods/
+apps/mobile/ios/**/.symlinks/
+apps/mobile/ios/**/.env
+apps/mobile/ios/**/.env.*
+
+# Android
+apps/mobile/android/local.properties
+apps/mobile/android/app/debug/
+apps/mobile/android/app/profile/
+apps/mobile/android/app/release/
+apps/mobile/android/.gradle
+apps/mobile/android/.idea
+apps/mobile/android/.classpath
+apps/mobile/android/.c9/
+apps/mobile/android/*.launch
+apps/mobile/android/.settings/
+apps/mobile/android/*.sublime-workspace
+
+# ============================================================================
+# IDE & EDITOR
+# ============================================================================
+
+# VS Code
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# WebStorm / IntelliJ
+.idea/
+.idea/*
+!.idea/runConfigurations/
+*.iws
+*.iml
+*.ipr
+*.iml
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+.vim/
+*.swp
+*.swo
+*~
+.vimrc
+.netrwhist
+
+# Emacs
+*~
+\#*#
+.\#*
+
+# Nano
+.nano_history
+
+# ============================================================================
+# OPERATING SYSTEM
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.TemporaryItems
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+.windows-build-tools
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# BUILD & ARTIFACTS
+# ============================================================================
+
+# Build directories
+dist/
+build/
+.next/
+out/
+.turbo/
+coverage/
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Archives
+*.7z
+*.deb
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ============================================================================
+# TESTING & COVERAGE
+# ============================================================================
+
+# Jest / Vitest coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# E2E Tests
+tests/e2e/.cache/
+playwright/.cache/
+.playwright
+
+# ============================================================================
+# DOCKER & CONTAINERS
+# ============================================================================
+
+# Docker
+docker-compose.override.yml
+.docker/config.json
+.docker/
+
+# Container data
+postgres_data/
+mysql_data/
+mongo_data/
+redis_data/
+
+# ============================================================================
+# CI/CD
+# ============================================================================
+
+# GitHub Actions
+.github/workflows/**/node_modules/
+
+# GitLab CI
+.gitlab-ci-runner/
+
+# Jenkins
+.jenkins/
+jenkins.log
+
+# ============================================================================
+# TEMPORARY & CACHE FILES
+# ============================================================================
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.bak
+*.swp
+*.swo
+
+# Cache directories
+.cache/
+.eslintcache
+.stylelintcache
+.parcel-cache
+.next
+.nuxt
+.cache
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.venv
+
+# Temporary directories
+tmp/
+temp/
+.tmp/
+
+# ============================================================================
+# PACKAGE MANAGERS & BUILD TOOLS
+# ============================================================================
+
+# Turbo
+.turbo/
+dist-new/
+
+# Webpack
+.webpack/
+
+# Rollup
+.rollup.cache
+
+# Grunt
+.grunt/
+
+# Gulp
+.gulp/
+
+# Cargo (Rust)
+Cargo.lock
+target/
+
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle
+build/
+
+# ============================================================================
+# DOCUMENTATION & LOGS
+# ============================================================================
+
+# Generated documentation
+docs/_build/
+site/
+.docs/
+
+# Application logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# System logs
+syslog
+*.slog
+
+# ============================================================================
+# MISC & GENERATED FILES
+# ============================================================================
+
+# OS temporary files
+.Thumbs.db
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ruby
+*.gem
+.bundle
+vendor/bundle
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# ============================================================================
+# PROJECT SPECIFIC
+# ============================================================================
+
+# SQLite databases
+sqlite/
+*.db
+
+# Certificates & Keys
+.cpos/certificates/
+~/.cpos/certificates/
+
+# ============================================================================
+# EXCEPT (Important files to track)
+# ============================================================================
+
+# DO NOT ignore these files
+!.gitkeep
+!.env.example
+!.env.development.example
+!.env.production.example
+!**/.gitkeep
+!openspec/
+
+# ============================================================================
+# END .gitignore
+# ============================================================================
